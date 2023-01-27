@@ -5,43 +5,48 @@ let todos = [];
 let idCount = 0;
 
 app.use(express.json());
-
-app.get('/tasks', (req, res) => {
+app.route('/tasks')
+  .get((req, res) => {
 
     res.send(todos);
-});
-app.post('/tasks', (req, res) => {
-    let task = {
-        id: idCount++,
-        name: req.body.name,
-        isCompleted: false
+  })
+  .post((req, res) => {
+    let hello =1;
+    console.log(hello);
+    
+    const task = {
+      ...req.body,
+      id: idCount++,
+      isCompleted: false
 
     };
     res.status(201);
     todos.push(task);
     res.send(todos);
-});
-app.get('/tasks/:id', (req, res) => {
-    const reqIndex = todos.findIndex(x => x.id == req.params.id);
-    if (reqIndex == -1) {
-        res.send(404);
-    }
-    else {
-        res.send(todos[reqIndex]);
-    }
-});
-app.delete('/tasks', (req, res) => {
+  })
+  .delete((req, res) => {
     todos = todos.filter(todo => todo.isCompleted === false);
     res.send(todos);
-});
-app.put('/tasks/:id', (req, res) => {
-    const reqIndex = todos.findIndex(x => x.id == req.params.id);
+  });
+app.route('/tasks/:id')
+  .get((req, res) => {
+    const reqIndex = todos.findIndex(x => x.id === parseInt(req.params.id));
     if (reqIndex == -1) {
-        res.send(404);
+      res.send(404);
+    }
+    else {
+      res.send(todos[reqIndex]);
+    }
+  })
+  .put('/tasks/:id', (req, res) => {
+    const reqIndex = todos.findIndex(x => x.id == req.params.id);
+    if (reqIndex === -1) {
+      res.send(404);
     }
     Object.assign(todos[reqIndex], req.body);
     res.send(todos[reqIndex]);
-});
+  });
+
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+  console.log(`Example app listening on port ${port}`);
 });
