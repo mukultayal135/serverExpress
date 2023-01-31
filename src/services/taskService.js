@@ -1,31 +1,46 @@
-const todos = [{ id: 1, name: 'course1' },
-  { id: 2, name: 'tasks1', isCompleted: false },
-  { id: 3, name: 'task1', isCompleted: false }];
-let id = 4;
 
-const { Task } = require('../database/models');
+const { task } = require('../models');
 
-exports.getAllTasks = a;
-exports.getTask = (id) => {
-  const task = todos.find((x) => x.id === parseInt(id));
-  if (!task) {
+exports.getAllTasks = async () => await task.findAll();
+exports.getTask = async (id) => {
+  const Task = await task.findOne(
+    {
+      where: { id:id }
+    });
+  console.log(Task);
+  if (!Task) {
     throw new Error('Task not found');
   }
-  return task;
+  return Task;
 };
-exports.deleteTask = () => todos.filter((task) => task.isCompleted === false);
-exports.createTask = (body) => {
-  const task = {
-    id: id++,
-    name: body.name,
-    isCompleted: false,
+
+exports.deleteTask = async() => {
+  await task.destroy({
+    where:{
+      isComplete:true
+    }
+  });
+  return ;
+};
+exports.createTask = async (body) => {
+  const Task = {
+    title: body.title,
+    isComplete: false,
   };
+  const createdTask=await task.create(Task);
+  return createdTask;
 };
-exports.updateTask = (id, body) => {
-  const reqIndex = todos.findIndex((x) => x.id == id);
-  if (reqIndex === -1) {
+exports.updateTask = async (id) => {
+  const Task = await task.findOne({
+    where:{
+      id:id
+    }
+  });
+  if (!Task) {
     throw new Error('Task not found');
   }
-  Object.assign(todos[reqIndex], body);
-  return todos[reqIndex];
+  Task.isComplete=true;
+  await Task.save();
+  return Task;
+    
 };
